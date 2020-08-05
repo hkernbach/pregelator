@@ -1,24 +1,18 @@
-import React, {useState, useContext} from 'react';
+import React, {useContext} from 'react';
 import {
   Heading,
   Box,
   DataTable,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  TableHeader,
   Text
 } from 'grommet';
 
-import Pregel from './Pregel';
 import {PregelContext} from './PregelContext';
 import {useExecution} from "./ExecutionContext";
 import {post} from "axios";
 
 const getRunning = (pregels) => {
   let filteredArr = [];
-  for (let [key, pregel] of Object.entries(pregels)) {
+  for (let [, pregel] of Object.entries(pregels)) {
     if (pregel.state === 'running') {
       filteredArr.push(pregel);
     }
@@ -28,7 +22,7 @@ const getRunning = (pregels) => {
 
 const getDone = (pregels) => {
   let filteredArr = [];
-  for (let [key, pregel] of Object.entries(pregels)) {
+  for (let [, pregel] of Object.entries(pregels)) {
     if (pregel.state === 'done') {
       filteredArr.push(pregel);
     }
@@ -37,8 +31,8 @@ const getDone = (pregels) => {
 };
 
 const RunningPregelList = () => {
-  const [execution, setExecution] = useExecution();
-  const [pregels, setPregels] = useContext(PregelContext);
+  const [, setExecution] = useExecution();
+  const [pregels] = useContext(PregelContext);
 
   const fetchExecutionResult = (execution) => {
     console.log(execution);

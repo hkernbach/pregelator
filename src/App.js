@@ -13,11 +13,6 @@ import {
 import {FormClose, Notification} from 'grommet-icons';
 import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ace from 'brace';
-import 'brace/mode/json';
-import 'brace/theme/monokai';
-
-import {post} from "axios";
 
 // Contexts
 import {ExecutionProvider} from "./ExecutionContext";
@@ -55,18 +50,6 @@ const AppBar = (props) => (
     {...props}
   />
 );
-
-const waitForPregelResult = async function () {
-  const response = await post(
-    'http://localhost:8529/_db/_system/pregeli/status',
-    {
-      pid: 123
-    },
-    {
-      headers:
-        {'Content-Type': 'application/json'}
-    });
-}
 
 function App() {
   const [showSidebar, setShowSidebar] = useState(true);

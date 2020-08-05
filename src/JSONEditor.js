@@ -1,16 +1,19 @@
-import React, {Component, useContext, useEffect, useState, useRef} from 'react';
+import React, {useContext, useEffect, useState, useRef} from 'react';
 
 import {JsonEditor as Editor} from "jsoneditor-react";
 import 'jsoneditor-react/es/editor.min.css';
 import './css/customEditor.css';
 
 import ace from "brace";
+import 'brace/mode/json';
+import 'brace/theme/monokai';
+
 import {Box, Button, Select} from "grommet/index";
-import {get, post} from "axios";
+import {post} from "axios";
 import {toast} from "react-toastify";
 
-import {PregelContext, PregelProvider, usePregel} from "./PregelContext";
-import {SmartGraphListContext, SmartGraphListProvider} from "./SmartGraphListContext";
+import {usePregel} from "./PregelContext";
+import {SmartGraphListContext} from "./SmartGraphListContext";
 import {useExecution} from "./ExecutionContext";
 
 const exampleAlgorithm = require('./algos/exampleAlgorithm.js').exampleAlgo;
@@ -59,18 +62,7 @@ const JSONEditor = () => {
   useInterval(() => {
       // Update logic
       let checkState = (pregels) => {
-        const getRunning = (pregels) => {
-          let filteredObj = {};
-          for (let [key, pregel] of Object.entries(pregels)) {
-            if (pregel.state === 'running') {
-              filteredObj[key] = pregel;
-            }
-          }
-          return filteredObj;
-        };
-
-        let runningPregels = getRunning(pregels);
-        for (let [key, pregel] of Object.entries(pregels)) {
+        for (let [, pregel] of Object.entries(pregels)) {
           if (pregel.state === 'running') {
             post(
               'http://localhost:8529/_db/_system/pregeli/status',
@@ -152,7 +144,7 @@ const JSONEditor = () => {
 // global states
   const [graphs] = useContext(SmartGraphListContext);
   const [pregels, setPregels] = usePregel();
-  const [execution, setExecution] = useExecution();
+  const [execution] = useExecution();
 
 // local state
   const [selectedGraph, setSelectedGraph] = useState(null);

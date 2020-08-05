@@ -3,7 +3,7 @@ import {PregelContext} from "./PregelContext";
 import {Heading} from "grommet/index";
 
 const AppBarInfo = () => {
-  const [pregels, setPregels] = useContext(PregelContext);
+  const [pregels] = useContext(PregelContext);
   return (
     <div>
       <Heading level='4' margin='none'>Pregelator</Heading>

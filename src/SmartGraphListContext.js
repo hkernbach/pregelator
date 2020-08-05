@@ -1,5 +1,5 @@
 import React, {useState, createContext, useEffect} from 'react';
-import {get, post} from "axios";
+import {get} from "axios";
 
 export const SmartGraphListContext = createContext();
 

@@ -1,10 +1,10 @@
-import React, {useState, createContext, useContext, useEffect} from 'react';
+import React, {useState, createContext, useContext} from 'react';
 
 export const PregelContext = createContext();
 
 export const PregelProvider = props => {
   const [pregels, setPregels] = useState({});
-  
+
   return (
     <PregelContext.Provider value={[pregels, setPregels]}>
       {props.children}
