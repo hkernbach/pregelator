@@ -8,6 +8,7 @@ import {toast} from "react-toastify";
 
 import {PregelContext, PregelProvider, usePregel} from "./PregelContext";
 import {SmartGraphListContext, SmartGraphListProvider} from "./SmartGraphListContext";
+import {useExecution} from "./ExecutionContext";
 
 const exampleAlgorithm = require('./algos/exampleAlgorithm.js').exampleAlgo;
 
@@ -15,9 +16,8 @@ const EditorActionsBar = (props) => (
   <Box
     direction='row'
     align='center'
-    justify='between'
     background='#272822'
-    pad={{left: 'medium', right: 'small', vertical: 'small'}}
+    pad={{left: 'small', right: 'small', vertical: 'small'}}
     elevation='medium'
     style={{zIndex: '1'}}
     {...props}
@@ -28,7 +28,6 @@ let editorRef = React.createRef();
 let outputEditorRef = React.createRef();
 
 const notifyUser = function (msg) {
-  outputEditorRef.current.jsonEditor.set([msg]);
   toast(msg);
 }
 
@@ -55,7 +54,7 @@ function useInterval(callback, delay) {
 
 const JSONEditor = () => {
   useInterval(() => {
-      // Your custom logic here
+      // Update logic
       let checkState = (pregels) => {
         const getRunning = (pregels) => {
           let filteredObj = {};
@@ -90,7 +89,11 @@ const JSONEditor = () => {
             });
           }
         }
+
+        // check output editor changes
+        outputEditorRef.current.jsonEditor.set(execution);
       }
+
       checkState(pregels);
     },
     1000
@@ -132,6 +135,7 @@ const JSONEditor = () => {
           "pid": response.data.pid,
           "totalRuntime": null,
           "resultField": resultField,
+          "selectedGraph": selectedGraph,
           "state": "running"
         }
         return {...updated};
@@ -143,11 +147,11 @@ const JSONEditor = () => {
   }
 
 // global states
-  const [graphs, setGraphs] = useContext(SmartGraphListContext);
+  const [graphs] = useContext(SmartGraphListContext);
   const [pregels, setPregels] = usePregel();
+  const [execution, setExecution] = useExecution();
 
 // local state
-  const [interval, setInitInterval] = useState(false);
   const [selectedGraph, setSelectedGraph] = useState(null);
 
   return (
@@ -166,6 +170,7 @@ const JSONEditor = () => {
         <Button
           primary
           label="Execute"
+          margin={{left: 'small'}}
           onClick={executeAlgorithm}
         />
       </EditorActionsBar>
@@ -184,7 +189,7 @@ const JSONEditor = () => {
         </Box>
         <Box flex>
           <Editor ref={outputEditorRef}
-                  value={["no pregel algorithm executed."]}
+                  value={{}}
                   navigationBar={false}
                   mainMenuBar={false}
                   mode={Editor.modes.code}

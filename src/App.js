@@ -1,5 +1,7 @@
 import React, {useContext, useState} from "react";
 
+// 3rd Party
+import 'axios';
 import {
   Box,
   Button,
@@ -9,23 +11,24 @@ import {
   ResponsiveContext,
 } from 'grommet';
 import {FormClose, Notification} from 'grommet-icons';
-
 import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
 import ace from 'brace';
 import 'brace/mode/json';
 import 'brace/theme/monokai';
 
-import 'axios';
-
+// Editor
 import {JsonEditor as Editor} from 'jsoneditor-react';
 import 'jsoneditor-react/es/editor.min.css';
 import './css/customEditor.css';
 import {post} from "axios";
 
+// Contexts
+import {ExecutionProvider} from "./ExecutionContext";
 import {PregelProvider} from './PregelContext';
-import {SmartGraphListContext, SmartGraphListProvider} from "./SmartGraphListContext";
+import {SmartGraphListProvider} from "./SmartGraphListContext";
+
+// Components
 import RunningPregelList from "./RunningPregelList";
 import AppBarInfo from "./AppBarInfo";
 import JSONEditor from "./JSONEditor";
@@ -74,67 +77,69 @@ function App() {
 
   return (
     <PregelProvider>
-      <SmartGraphListProvider>
-        <Grommet theme={theme} full>
-          <ResponsiveContext.Consumer>
-            {size => (
-              <Box fill>
-                <AppBar>
-                  <AppBarInfo></AppBarInfo>
-                  <Button
-                    icon={<Notification/>}
-                    onClick={() => setShowSidebar(!showSidebar)}
-                  />
-                </AppBar>
-                <ToastContainer/>
-                <Box direction='row' flex overflow={{horizontal: 'hidden'}}>
-                  <Box flex>
-                    <JSONEditor>
-                    </JSONEditor>
-                  </Box>
+      <ExecutionProvider>
+        <SmartGraphListProvider>
+          <Grommet theme={theme} full>
+            <ResponsiveContext.Consumer>
+              {size => (
+                <Box fill>
+                  <AppBar>
+                    <AppBarInfo></AppBarInfo>
+                    <Button
+                      icon={<Notification/>}
+                      onClick={() => setShowSidebar(!showSidebar)}
+                    />
+                  </AppBar>
+                  <ToastContainer position="bottom-left"/>
+                  <Box direction='row' flex overflow={{horizontal: 'hidden'}}>
+                    <Box flex>
+                      <JSONEditor>
+                      </JSONEditor>
+                    </Box>
 
-                  {(!showSidebar || size !== 'small') ? (
-                    <Collapsible direction="horizontal" open={showSidebar}>
-                      <Box
-                        flex
-                        pad='small'
-                        width='medium'
-                        background='light-2'
-                        elevation='small'
-                      >
-                        <RunningPregelList/>
-                      </Box>
-                    </Collapsible>
-                  ) : (
-                    <Layer>
-                      <Box
-                        background='light-2'
-                        tag='header'
-                        justify='end'
-                        align='center'
-                        direction='row'
-                      >
-                        <Button
-                          icon={<FormClose/>}
-                          onClick={() => setShowSidebar(false)}
-                        />
-                      </Box>
-                      <Box
-                        fill
-                        background='light-2'
-                        align='center'
-                        justify='center'
-                      >
-                        sidebar
-                      </Box>
-                    </Layer>
-                  )}
+                    {(!showSidebar || size !== 'small') ? (
+                      <Collapsible direction="horizontal" open={showSidebar}>
+                        <Box
+                          flex
+                          pad='small'
+                          width='medium'
+                          background='light-2'
+                          elevation='small'
+                        >
+                          <RunningPregelList/>
+                        </Box>
+                      </Collapsible>
+                    ) : (
+                      <Layer>
+                        <Box
+                          background='light-2'
+                          tag='header'
+                          justify='end'
+                          align='center'
+                          direction='row'
+                        >
+                          <Button
+                            icon={<FormClose/>}
+                            onClick={() => setShowSidebar(false)}
+                          />
+                        </Box>
+                        <Box
+                          fill
+                          background='light-2'
+                          align='center'
+                          justify='center'
+                        >
+                          sidebar
+                        </Box>
+                      </Layer>
+                    )}
+                  </Box>
                 </Box>
-              </Box>
-            )}
-          </ResponsiveContext.Consumer>
-        </Grommet>
-      </SmartGraphListProvider>
+              )}
+            </ResponsiveContext.Consumer>
+          </Grommet>
+        </SmartGraphListProvider>
+      </ExecutionProvider>
     </PregelProvider>
   );
 }
