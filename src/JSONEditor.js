@@ -1,10 +1,13 @@
-import React, {useContext} from 'react';
-import {PregelContext} from "./PregelContext";
+import React, {Component, useContext, useEffect, useState, useRef} from 'react';
+
 import {JsonEditor as Editor} from "jsoneditor-react";
 import ace from "brace";
-import {Box, Button} from "grommet/index";
-import {post} from "axios";
+import {Box, Button, Select} from "grommet/index";
+import {get, post} from "axios";
 import {toast} from "react-toastify";
+
+import {PregelContext, PregelProvider, usePregel} from "./PregelContext";
+import {SmartGraphListContext, SmartGraphListProvider} from "./SmartGraphListContext";
 
 const exampleAlgorithm = require('./algos/exampleAlgorithm.js').exampleAlgo;
 
@@ -13,7 +16,7 @@ const EditorActionsBar = (props) => (
     direction='row'
     align='center'
     justify='between'
-    background='brand'
+    background='#272822'
     pad={{left: 'medium', right: 'small', vertical: 'small'}}
     elevation='medium'
     style={{zIndex: '1'}}
@@ -29,18 +32,93 @@ const notifyUser = function (msg) {
   toast(msg);
 }
 
-const JSONEditor = ({pid, state}) => {
-  const [pregels, setPregels] = useContext(PregelContext);
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
 
-  const executeAlgorithm = async function () {
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
+
+const JSONEditor = () => {
+  useInterval(() => {
+      // Your custom logic here
+      let checkState = (pregels) => {
+        const getRunning = (pregels) => {
+          let filteredObj = {};
+          for (let [key, pregel] of Object.entries(pregels)) {
+            if (pregel.state === 'running') {
+              filteredObj[key] = pregel;
+            }
+          }
+          return filteredObj;
+        };
+
+        let runningPregels = getRunning(pregels);
+        for (let [key, pregel] of Object.entries(pregels)) {
+          if (pregel.state === 'running') {
+            post(
+              'http://localhost:8529/_db/_system/pregeli/status',
+              {
+                pid: pregel.pid
+              },
+              {
+                headers:
+                  {'Content-Type': 'application/json'}
+              }).then((response) => {
+              if (response.data && response.data.state === 'done') {
+                setPregels(prevPregels => {
+                  let updated = prevPregels;
+                  updated[pregel.pid].state = response.data.state;
+                  updated[pregel.pid].totalRuntime = response.data.totalRuntime.toFixed(5);
+                  return {...updated};
+                });
+              }
+            });
+          }
+        }
+      }
+      checkState(pregels);
+    },
+    1000
+  )
+  ;
+
+  let executeAlgorithm = async function () {
     try {
       let algorithm = editorRef.current.jsonEditor.get();
+
+      let resultField;
+      if ('resultField' in algorithm) {
+        resultField = algorithm.resultField;
+      } else {
+        toast.error("Attribute resultField is missing!");
+        return;
+      }
+
+      if (!selectedGraph) {
+        toast.error("No SmartGraph selected!");
+        return;
+      }
 
       const response = await post(
         'http://localhost:8529/_db/_system/pregeli/start',
         {
-          name: "customAlgo",
-          graphName: "PageRankGraph",
+          name: "AIR",
+          graphName: selectedGraph,
           algorithm: algorithm
         },
         {
@@ -48,20 +126,51 @@ const JSONEditor = ({pid, state}) => {
             {'Content-Type': 'application/json'}
         });
 
-      setPregels(prevPregels => [...prevPregels, {
-        "pid": response.data.pid,
-        "state": "running"
-      }]);
+      setPregels(prevPregels => {
+        let updated = prevPregels;
+        updated[response.data.pid] = {
+          "pid": response.data.pid,
+          "totalRuntime": null,
+          "resultField": resultField,
+          "state": "running"
+        }
+        return {...updated};
+      });
       notifyUser("Pregel started, PID: " + response.data.pid);
     } catch (e) {
-      console.log(e);
       toast.error("Parse error!");
     }
   }
 
+// global states
+  const [graphs, setGraphs] = useContext(SmartGraphListContext);
+  const [pregels, setPregels] = usePregel();
+
+// local state
+  const [interval, setInitInterval] = useState(false);
+  const [selectedGraph, setSelectedGraph] = useState(null);
+
   return (
-    <Box flex direction="column" flex="grow" fill="horizontal">
-      <Box direction='row'>
+    <Box direction="column" flex="grow" fill="horizontal">
+
+      <EditorActionsBar>
+        <Select
+          options={graphs}
+          placeholder={'Select SmartGraph'}
+          value={selectedGraph}
+          onChange={({option}) => {
+            setSelectedGraph(option);
+          }}
+        />
+
+        <Button
+          primary
+          label="Execute"
+          onClick={executeAlgorithm}
+        />
+      </EditorActionsBar>
+
+      <Box direction='row' fill="vertical">
         <Box flex>
           <Editor ref={editorRef}
                   value={exampleAlgorithm}
@@ -70,7 +179,7 @@ const JSONEditor = ({pid, state}) => {
                   mode={Editor.modes.code}
                   ace={ace}
                   theme="ace/theme/monokai"
-                  style={{border: 0}}
+                  htmlElementProps={{"className": "editorWrapper"}}
           />
         </Box>
         <Box flex>
@@ -82,17 +191,10 @@ const JSONEditor = ({pid, state}) => {
                   ace={ace}
                   theme="ace/theme/monokai"
                   style={{border: 0}}
+                  htmlElementProps={{"className": "editorWrapper"}}
           />
         </Box>
       </Box>
-
-      <EditorActionsBar>
-        <Button
-          primary
-          label="Execute"
-          onClick={executeAlgorithm}
-        />
-      </EditorActionsBar>
     </Box>
   )
 }

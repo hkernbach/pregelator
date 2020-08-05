@@ -7,7 +7,7 @@ const AppBarInfo = () => {
   return (
     <div>
       <Heading level='4' margin='none'>Pregelator</Heading>
-      <Heading level='6' margin='none'>Executed algorithms: {pregels.length}</Heading>
+      <Heading level='6' margin='none'>Executed algorithms: {Object.keys(pregels).length}</Heading>
     </div>
   )
 }

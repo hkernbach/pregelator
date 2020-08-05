@@ -1,18 +1,13 @@
-import React, {useState, createContext} from 'react';
+import React, {useState, createContext, useContext, useEffect} from 'react';
 
 export const PregelContext = createContext();
 
 export const PregelProvider = props => {
-  const [pregels, setPregels] = useState([
-    {
-      "pid": 123,
-      "state": "done"
-    },
-    {
-      "pid": 456,
-      "state": "running"
-    }
-  ]);
+  const [pregels, setPregels] = useState({});
+
+  useEffect(() => {
+    console.log("RECEIVED A CHAGNE");
+  }, []);
 
   return (
     <PregelContext.Provider value={[pregels, setPregels]}>
@@ -20,3 +15,5 @@ export const PregelProvider = props => {
     </PregelContext.Provider>
   );
 }
+
+export const usePregel = () => useContext(PregelContext);
