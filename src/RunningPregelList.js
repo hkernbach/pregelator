@@ -9,6 +9,7 @@ import {
 import {PregelContext} from './PregelContext';
 import {useExecution} from "./ExecutionContext";
 import {post} from "axios";
+import {toast} from "react-toastify";
 
 const getRunning = (pregels) => {
   let filteredArr = [];
@@ -35,7 +36,8 @@ const RunningPregelList = () => {
   const [pregels] = useContext(PregelContext);
 
   const fetchExecutionResult = (execution) => {
-    console.log(execution);
+    toast(`Fetching status now of pid: ${execution.pid}`);
+
     post(
       'http://localhost:8529/_db/_system/pregeli/status',
       {
