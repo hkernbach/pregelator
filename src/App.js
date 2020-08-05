@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useState} from "react";
 
 // 3rd Party
 import 'axios';
@@ -11,16 +11,12 @@ import {
   ResponsiveContext,
 } from 'grommet';
 import {FormClose, Notification} from 'grommet-icons';
-import {ToastContainer, toast} from 'react-toastify';
+import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ace from 'brace';
 import 'brace/mode/json';
 import 'brace/theme/monokai';
 
-// Editor
-import {JsonEditor as Editor} from 'jsoneditor-react';
-import 'jsoneditor-react/es/editor.min.css';
-import './css/customEditor.css';
 import {post} from "axios";
 
 // Contexts
@@ -73,7 +69,7 @@ const waitForPregelResult = async function () {
 }
 
 function App() {
-  const [showSidebar, setShowSidebar] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(true);
 
   return (
     <PregelProvider>

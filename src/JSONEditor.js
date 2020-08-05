@@ -1,6 +1,9 @@
 import React, {Component, useContext, useEffect, useState, useRef} from 'react';
 
 import {JsonEditor as Editor} from "jsoneditor-react";
+import 'jsoneditor-react/es/editor.min.css';
+import './css/customEditor.css';
+
 import ace from "brace";
 import {Box, Button, Select} from "grommet/index";
 import {get, post} from "axios";

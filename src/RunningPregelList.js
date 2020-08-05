@@ -2,6 +2,7 @@ import React, {useState, useContext} from 'react';
 import {
   Heading,
   Box,
+  DataTable,
   Table,
   TableBody,
   TableCell,
@@ -87,32 +88,26 @@ const RunningPregelList = () => {
         <Text>No pregel algorithm started yet.</Text>
         }
         {Object.keys(getRunning(pregels)).length > 0 &&
-        <Table alignSelf='stretch'>
-          <TableHeader>
-            <TableRow>
-              <TableCell scope="col" border="bottom">
-                ID
-              </TableCell>
-              <TableCell scope="col" border="bottom">
-                ResultField
-              </TableCell>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-
+        <DataTable
+          columns={[
             {
-              getRunning(pregels).map((pregel) =>
-                <TableRow key={pregel.pid}>
-                  <TableCell scope="row">
-                    <strong>{pregel.pid}</strong>
-                  </TableCell>
-                  <TableCell>{pregel.resultField}</TableCell>
-                </TableRow>
-              )
-            }
+              property: 'pid',
+              header: <Text>ID</Text>,
+              primary: true,
+            },
+            {
+              property: 'percent',
+              header: 'Result field',
+              render: datum => (
+                <Box>
+                  <Text>{datum.resultField}</Text>
+                </Box>
 
-          </TableBody>
-        </Table>
+              )
+            },
+          ]}
+          data={getRunning(pregels)}
+        />
         }
 
       </Box>
@@ -124,32 +119,29 @@ const RunningPregelList = () => {
         }
         {Object.keys(getDone(pregels)).length > 0 &&
 
-        <Table alignSelf='stretch'>
-          <TableHeader>
-            <TableRow>
-              <TableCell scope="col" border="bottom">
-                ID
-              </TableCell>
-              <TableCell scope="col" border="bottom">
-                Runtime
-              </TableCell>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-
+        <DataTable
+          columns={[
             {
-              getDone(pregels).map((pregel) =>
-                <TableRow key={pregel.pid}>
-                  <TableCell scope="row">
-                    <strong>{pregel.pid}</strong>
-                  </TableCell>
-                  <TableCell>{pregel.totalRuntime}</TableCell>
-                </TableRow>
-              )
-            }
+              property: 'pid',
+              header: <Text>ID</Text>,
+              primary: true,
+            },
+            {
+              property: 'percent',
+              header: 'Execution time',
+              render: datum => (
+                <Box>
+                  <Text>{datum.totalRuntime}</Text>
+                </Box>
 
-          </TableBody>
-        </Table>
+              )
+            },
+          ]}
+          onClickRow={(datum) => {
+            fetchExecutionResult(datum.datum);
+          }}
+          data={getDone(pregels)}
+        />
 
         }
       </Box>
