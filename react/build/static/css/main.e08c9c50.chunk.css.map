@@ -1,0 +1,1 @@
+{"version":3,"sources":["customEditor.css"],"names":[],"mappings":"AAAA,eACE,WACF,CAEA,YACE,QACF","file":"main.e08c9c50.chunk.css","sourcesContent":[".editorWrapper {\n  height: 100%;\n}\n\n.jsoneditor {\n  border: 0;\n}"]}
