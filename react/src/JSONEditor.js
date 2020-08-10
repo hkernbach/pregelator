@@ -243,7 +243,7 @@ const JSONEditor = () => {
         <Box flex direction='column'>
           <Box flex direction='row' width={'full'} height="small">
             <Box basis={'1/2'} background='#272822'>
-              <Text margin={'xsmall'} weight={'bold'}>Summary:</Text>
+              <Text margin={'xsmall'} weight={'bold'}>Summary</Text>
               <Editor ref={outputEditorRef}
                       value={{}}
                       navigationBar={false}
