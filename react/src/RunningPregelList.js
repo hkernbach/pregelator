@@ -10,7 +10,7 @@ import {PregelContext} from './PregelContext';
 import {useExecution} from "./ExecutionContext";
 import {post} from "axios";
 import {toast} from "react-toastify";
-import {Button, Select} from "grommet/index";
+import {Button} from "grommet/index";
 
 const getRunning = (pregels) => {
   let filteredArr = [];
