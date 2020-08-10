@@ -8,7 +8,7 @@ import ace from "brace";
 import 'brace/mode/json';
 import 'brace/theme/monokai';
 
-import {Box, Button, Select} from "grommet/index";
+import {Box, Button, DataTable, Select, Text, Paragraph} from "grommet/index";
 import {post} from "axios";
 import {toast} from "react-toastify";
 
@@ -32,6 +32,7 @@ const EditorActionsBar = (props) => (
 
 let editorRef = React.createRef();
 let outputEditorRef = React.createRef();
+let previewEditorRef = React.createRef();
 
 const notifyUser = function (msg) {
   toast(msg);
@@ -86,7 +87,8 @@ const JSONEditor = () => {
         }
 
         // check output editor changes
-        outputEditorRef.current.jsonEditor.set(execution);
+        outputEditorRef.current.jsonEditor.set(execution.summary || {});
+        previewEditorRef.current.jsonEditor.set(execution.preview || {});
       }
 
       checkState(pregels);
@@ -182,17 +184,109 @@ const JSONEditor = () => {
                   htmlElementProps={{"className": "editorWrapper"}}
           />
         </Box>
-        <Box flex>
-          <Editor ref={outputEditorRef}
-                  value={{}}
-                  navigationBar={false}
-                  mainMenuBar={false}
-                  mode={Editor.modes.code}
-                  ace={ace}
-                  theme="ace/theme/monokai"
-                  style={{border: 0}}
-                  htmlElementProps={{"className": "editorWrapper"}}
-          />
+
+        <Box flex direction='column'>
+          <Box flex direction='row' width={'full'} height="small">
+            <Box basis={'1/2'} background='#272822'>
+              <Text margin={'xsmall'} weight={'bold'}>Summary</Text>
+              <Editor ref={outputEditorRef}
+                      value={{}}
+                      navigationBar={false}
+                      mainMenuBar={false}
+                      mode={Editor.modes.code}
+                      ace={ace}
+                      theme="ace/theme/monokai"
+                      style={{border: 0}}
+                      htmlElementProps={{"className": "editorWrapper"}}
+              />
+            </Box>
+            <Box basis={'1/2'} background='#272822'>
+              <Text margin={'xsmall'} weight={'bold'}>Preview</Text>
+              <Editor ref={previewEditorRef}
+                      value={{}}
+                      navigationBar={false}
+                      mainMenuBar={false}
+                      mode={Editor.modes.code}
+                      ace={ace}
+                      theme="ace/theme/monokai"
+                      style={{border: 0}}
+                      htmlElementProps={{"className": "editorWrapper"}}
+              />
+            </Box>
+          </Box>
+          <Box basis='2/3' overflow={"scroll"} background='#272822'>
+            <Text margin={'xsmall'} weight={'bold'}>Reports</Text>
+            <DataTable resizeable={false} size={"full"} alignSelf={"stretch"}
+                       columns={[
+                         {
+                           property: 'msg',
+                           header: <Text>Msg</Text>,
+                           size: 'medium',
+                           render: datum => (
+                             <Paragraph size={'small'}>
+                               {datum.msg}
+                             </Paragraph>
+                           )
+                         },
+                         {
+                           property: 'level',
+                           header: 'Level',
+                           primary: true,
+                           render: datum => (
+                             <Box>
+                               <Text size={'small'}>{datum.level}</Text>
+                             </Box>
+                           )
+                         },
+                         {
+                           header: <Text>Vertex</Text>,
+                           size: 'medium',
+                           render: datum => (
+                             <Box>
+                               <Text size={'small'}>{datum.annotations.vertex}</Text>
+                             </Box>
+                           )
+                         },
+                         {
+                           header: <Text>Shard</Text>,
+                           render: datum => (
+                             <Box>
+                               <Text size={'small'}>{datum.annotations["pregel-id"]?.shard}</Text>
+                             </Box>
+                           )
+                         },
+                         {
+                           property: 'phase-step',
+                           header: <Text>Step</Text>,
+                           render: datum => (
+                             <Box>
+                               <Text size={'small'}>{datum.annotations["phase-step"]}</Text>
+                             </Box>
+                           )
+                         },
+                         {
+                           property: 'phase',
+                           header: <Text>Phase</Text>,
+                           render: datum => (
+                             <Box>
+                               <Text size={'small'}>{datum.annotations["phase"]}</Text>
+                             </Box>
+                           )
+                         },
+                         {
+                           property: 'global-superstep',
+                           header: <Text>Superstep</Text>,
+                           render: datum => (
+                             <Box>
+                               <Text size={'small'}>{datum.annotations["global-superstep"]}</Text>
+                             </Box>
+                           )
+                         },
+                       ]}
+                       data={execution.reports || []}
+            />
+          </Box>
+
         </Box>
       </Box>
     </Box>
