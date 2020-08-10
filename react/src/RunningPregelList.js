@@ -144,8 +144,7 @@ const RunningPregelList = () => {
           columns={[
             {
               property: 'pid',
-              header: <Text>ID</Text>,
-              primary: true,
+              header: <Text>ID</Text>
             },
             {
               property: 'percent',

@@ -81,6 +81,9 @@ const JSONEditor = () => {
                   updated[pregel.pid].totalRuntime = response.data.totalRuntime.toFixed(5);
                   return {...updated};
                 });
+
+                // auto update if changed to done
+                fetchExecutionResult(pregel);
               }
             });
           }
@@ -146,10 +149,62 @@ const JSONEditor = () => {
 // global states
   const [graphs] = useContext(SmartGraphListContext);
   const [pregels, setPregels] = usePregel();
-  const [execution] = useExecution();
+  const [execution, setExecution] = useExecution();
 
 // local state
   const [selectedGraph, setSelectedGraph] = useState(null);
+
+  // TODO: export function - copy & paste of RunningPregelList
+  const fetchExecutionResult = (execution) => {
+    toast(`Fetching status now of pid: ${execution.pid}`);
+
+    post(
+      process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'status',
+      {
+        pid: execution.pid
+      },
+      {
+        headers:
+          {'Content-Type': 'application/json'}
+      }).then((responseStatus) => {
+      if (responseStatus.data && responseStatus.data.state === 'done') {
+        post(
+          process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'resultDetails',
+          {
+            graphName: execution.selectedGraph,
+            resultField: execution.resultField
+          },
+          {
+            headers:
+              {'Content-Type': 'application/json'}
+          }).then((responseDetails) => {
+          if (responseDetails.data) {
+            let reports = [];
+
+            if (responseStatus.data.reports && responseStatus.data.reports.length >= 0) {
+              for (let [, report] of Object.entries(responseStatus.data.reports)) {
+                reports.push(report);
+              }
+              reports = responseStatus.data.reports;
+              delete responseStatus.data.reports;
+            }
+
+            // State the output editor will be filled automatically
+            let result = {
+              summary: responseStatus.data,
+              preview: responseDetails.data,
+              reports: reports
+            };
+            result.summary.pid = execution.pid;
+
+            setExecution(prevExecution => {
+              return {...result};
+            });
+          }
+        });
+      }
+    });
+  };
 
   return (
     <Box direction="column" flex="grow" fill="horizontal">
@@ -188,7 +243,7 @@ const JSONEditor = () => {
         <Box flex direction='column'>
           <Box flex direction='row' width={'full'} height="small">
             <Box basis={'1/2'} background='#272822'>
-              <Text margin={'xsmall'} weight={'bold'}>Summary</Text>
+              <Text margin={'xsmall'} weight={'bold'}>Summary:</Text>
               <Editor ref={outputEditorRef}
                       value={{}}
                       navigationBar={false}
