@@ -117,6 +117,9 @@ const JSONEditor = () => {
   let executeAlgorithm = async function () {
     try {
       let algorithm = editorRef.current.editor.getValue();
+
+      //remove comments
+      algorithm = algorithm.replace(/\s*\/\/.*\n/g, '\n').replace(/\s*\/\*[\s\S]*?\*\//g, '');
       algorithm = JSON.parse(algorithm);
 
       let resultField;
@@ -157,6 +160,7 @@ const JSONEditor = () => {
       });
       notifyUser("Pregel started, PID: " + response.data.pid);
     } catch (e) {
+      console.log(e);
       toast.error("Parse error!");
     }
   }
@@ -250,7 +254,14 @@ const JSONEditor = () => {
                      width={'full'}
                      height={'100%'}
                      theme="monokai"
-            //onChange={{}}
+                     commands={[
+                       /*{
+                         name: "executeAlgorithm",
+                         bindKey: {win: "Ctrl-Enter", mac: "Command-Enter"},
+                         exec: executeAlgorithm
+                       }*/
+                     ]
+                     }
                      name="aceInputEditor"
                      setOptions={{useWorker: false}}
                      editorProps={{$blockScrolling: true}}
