@@ -271,7 +271,7 @@ const JSONEditor = () => {
         <Box flex direction='column'>
           <Box flex direction='row' width={'full'} height="small">
             <Box basis={'1/2'} background='#272822'>
-              <Text margin={'xsmall'} weight={'bold'}>Summary</Text>
+              <Box background={'#7D4CDB'}><Text margin={'xsmall'} weight={'bold'}>Summary</Text></Box>
               <AceEditor ref={outputEditorRef}
                          readOnly={true}
                          value={""}
@@ -286,7 +286,7 @@ const JSONEditor = () => {
               />
             </Box>
             <Box basis={'1/2'} background='#272822'>
-              <Text margin={'xsmall'} weight={'bold'}>Preview</Text>
+              <Box background={'#7D4CDB'}><Text margin={'xsmall'} weight={'bold'}>Preview</Text></Box>
               <AceEditor ref={previewEditorRef}
                          value={""}
                          readOnly={true}
@@ -301,8 +301,8 @@ const JSONEditor = () => {
               />
             </Box>
           </Box>
+          <Box background={'#7D4CDB'}><Text margin={'xsmall'} weight={'bold'}>Reports</Text></Box>
           <Box basis='2/3' overflow={"scroll"} background='#272822'>
-            <Text margin={'xsmall'} weight={'bold'}>Reports</Text>
             <DataTable resizeable={false} size={"full"} alignSelf={"stretch"} primaryKey={false}
                        columns={[
                          {
