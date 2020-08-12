@@ -1,0 +1,13 @@
+.smallList span {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.smallList {
+  border-radius: 5px;
+  background: rgba(255,255,255, 0.04);
+}
+
+.smallList li {
+  border: none;
+}

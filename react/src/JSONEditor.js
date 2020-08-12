@@ -4,8 +4,9 @@ import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/ext-language_tools"
 import "ace-builds/src-noconflict/mode-json";
+import "./css/customList.css"
 
-import {Box, Button, DataTable, Select, Text, Paragraph} from "grommet/index";
+import {Box, Button, DataTable, Select, Text, Paragraph, List} from "grommet/index";
 import {post} from "axios";
 import {toast} from "react-toastify";
 
@@ -251,7 +252,7 @@ const JSONEditor = () => {
                      theme="monokai"
             //onChange={{}}
                      name="aceInputEditor"
-                     setOptions={{useWorker:false}}
+                     setOptions={{useWorker: false}}
                      editorProps={{$blockScrolling: true}}
           />
         </Box>
@@ -269,7 +270,7 @@ const JSONEditor = () => {
                          theme="monokai"
                 //onChange={{}}
                          name="aceSummaryEditor"
-                         setOptions={{useWorker:false}}
+                         setOptions={{useWorker: false}}
                          editorProps={{$blockScrolling: true}}
               />
             </Box>
@@ -284,7 +285,7 @@ const JSONEditor = () => {
                          theme="monokai"
                 //onChange={{}}
                          name="aceSummaryEditor"
-                         setOptions={{useWorker:false}}
+                         setOptions={{useWorker: false}}
                          editorProps={{$blockScrolling: true}}
               />
             </Box>
@@ -304,18 +305,9 @@ const JSONEditor = () => {
                            )
                          },
                          {
-                           property: 'level',
-                           header: 'Level',
-                           render: datum => (
-                             <Box>
-                               <Text size={'small'}>{datum.level}</Text>
-                             </Box>
-                           )
-                         },
-                         {
                            property: "vertex",
                            header: "Vertex",
-                           size: 'medium',
+                           size: 'small',
                            render: datum => (
                              <Box>
                                <Text size={'small'}>{datum.annotations.vertex}</Text>
@@ -323,41 +315,26 @@ const JSONEditor = () => {
                            )
                          },
                          {
-                           property: "shard",
-                           header: "Shard",
+                           property: "info",
+                           header: "Info",
+                           size: 'small',
                            render: datum => (
-                             <Box>
-                               <Text size={'small'}>{datum.annotations["pregel-id"]?.shard}</Text>
-                             </Box>
+                             <List className={"smallList"}
+                                   pad={'xxsmall'}
+                                   primaryKey="name"
+                                   secondaryKey="content"
+                                   data={[
+                                     {name: 'Level', content: datum.level},
+                                     {name: 'Shard', content: datum.annotations["pregel-id"]?.shard},
+                                     {
+                                       name: 'Step / Superstep',
+                                       content: (datum.annotations["phase-step"] || 'nA') + " / " + (datum.annotations["global-superstep"] || 'nA')
+                                     },
+                                     {name: 'Phase', content: datum.annotations["phase"]}
+                                   ]}
+                             />
                            )
-                         },
-                         {
-                           property: 'phase-step',
-                           header: "Step",
-                           render: datum => (
-                             <Box>
-                               <Text size={'small'}>{datum.annotations["phase-step"]}</Text>
-                             </Box>
-                           )
-                         },
-                         {
-                           property: 'phase',
-                           header: "Phase",
-                           render: datum => (
-                             <Box>
-                               <Text size={'small'}>{datum.annotations["phase"]}</Text>
-                             </Box>
-                           )
-                         },
-                         {
-                           property: 'global-superstep',
-                           header: "Superstep",
-                           render: datum => (
-                             <Box>
-                               <Text size={'small'}>{datum.annotations["global-superstep"]}</Text>
-                             </Box>
-                           )
-                         },
+                         }
                        ]}
                        data={execution.reports || []}
             />
