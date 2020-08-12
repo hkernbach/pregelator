@@ -117,7 +117,6 @@ const JSONEditor = () => {
     try {
       let algorithm = editorRef.current.editor.getValue();
       algorithm = JSON.parse(algorithm);
-      console.log(algorithm);
 
       let resultField;
       if ('resultField' in algorithm) {
