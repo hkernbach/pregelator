@@ -98,8 +98,13 @@ const JSONEditor = () => {
           previewVal = JSON.stringify(execution.preview, null, 2)
         }
 
-        outputEditorRef.current.editor.setValue(outputVal, outputCursorPosition);
-        previewEditorRef.current.editor.setValue(previewVal, previewCursorPosition)
+        // only update if changed
+        if (outputEditorRef.current.editor.getValue() !== outputVal) {
+          outputEditorRef.current.editor.setValue(outputVal, outputCursorPosition);
+        }
+        if (previewEditorRef.current.editor.getValue() !== previewVal) {
+          previewEditorRef.current.editor.setValue(previewVal, previewCursorPosition)
+        }
       }
 
       checkState(pregels);
