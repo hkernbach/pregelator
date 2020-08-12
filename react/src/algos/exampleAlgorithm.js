@@ -23,6 +23,7 @@ const exampleAlgo = {
       name: "main",
       initProgram: [
         "seq",
+        ["error", "hallo"],
         ["accum-set!", "rank", ["/", 1, ["vertex-count"]]],
         ["accum-set!", "tmpRank", 0],
         [
