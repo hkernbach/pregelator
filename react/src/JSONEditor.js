@@ -1,12 +1,9 @@
 import React, {useContext, useEffect, useState, useRef} from 'react';
 
-import {JsonEditor as Editor} from "jsoneditor-react";
-import 'jsoneditor-react/es/editor.min.css';
-import './css/customEditor.css';
-
-import ace from "brace";
-import 'brace/mode/json';
-import 'brace/theme/monokai';
+import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/theme-monokai";
+import "ace-builds/src-noconflict/ext-language_tools"
+import "ace-builds/src-noconflict/mode-json";
 
 import {Box, Button, DataTable, Select, Text, Paragraph} from "grommet/index";
 import {post} from "axios";
@@ -90,8 +87,19 @@ const JSONEditor = () => {
         }
 
         // check output editor changes
-        outputEditorRef.current.jsonEditor.set(execution.summary || {});
-        previewEditorRef.current.jsonEditor.set(execution.preview || {});
+        let outputCursorPosition = outputEditorRef.current.editor.getCursorPosition();
+        let previewCursorPosition = previewEditorRef.current.editor.getCursorPosition();
+        let outputVal = "";
+        if (execution.summary) {
+          outputVal = JSON.stringify(execution.summary, null, 2)
+        }
+        let previewVal = "";
+        if (execution.preview) {
+          previewVal = JSON.stringify(execution.preview, null, 2)
+        }
+
+        outputEditorRef.current.editor.setValue(outputVal, outputCursorPosition);
+        previewEditorRef.current.editor.setValue(previewVal, previewCursorPosition)
       }
 
       checkState(pregels);
@@ -102,7 +110,9 @@ const JSONEditor = () => {
 
   let executeAlgorithm = async function () {
     try {
-      let algorithm = editorRef.current.jsonEditor.get();
+      let algorithm = editorRef.current.editor.getValue();
+      algorithm = JSON.parse(algorithm);
+      console.log(algorithm);
 
       let resultField;
       if ('resultField' in algorithm) {
@@ -229,14 +239,16 @@ const JSONEditor = () => {
 
       <Box direction='row' fill="vertical">
         <Box flex>
-          <Editor ref={editorRef}
-                  value={exampleAlgorithm}
-                  navigationBar={false}
-                  mainMenuBar={false}
-                  mode={Editor.modes.code}
-                  ace={ace}
-                  theme="ace/theme/monokai"
-                  htmlElementProps={{"className": "editorWrapper"}}
+          <AceEditor ref={editorRef}
+                     value={JSON.stringify(exampleAlgorithm, null, 2)}
+                     mode="json"
+                     width={'full'}
+                     height={'100%'}
+                     theme="monokai"
+            //onChange={{}}
+                     name="aceInputEditor"
+                     setOptions={{useWorker:false}}
+                     editorProps={{$blockScrolling: true}}
           />
         </Box>
 
@@ -244,38 +256,42 @@ const JSONEditor = () => {
           <Box flex direction='row' width={'full'} height="small">
             <Box basis={'1/2'} background='#272822'>
               <Text margin={'xsmall'} weight={'bold'}>Summary</Text>
-              <Editor ref={outputEditorRef}
-                      value={{}}
-                      navigationBar={false}
-                      mainMenuBar={false}
-                      mode={Editor.modes.code}
-                      ace={ace}
-                      theme="ace/theme/monokai"
-                      style={{border: 0}}
-                      htmlElementProps={{"className": "editorWrapper"}}
+              <AceEditor ref={outputEditorRef}
+                         readOnly={true}
+                         value={""}
+                         mode="json"
+                         width={'full'}
+                         height={'100%'}
+                         theme="monokai"
+                //onChange={{}}
+                         name="aceSummaryEditor"
+                         setOptions={{useWorker:false}}
+                         editorProps={{$blockScrolling: true}}
               />
             </Box>
             <Box basis={'1/2'} background='#272822'>
               <Text margin={'xsmall'} weight={'bold'}>Preview</Text>
-              <Editor ref={previewEditorRef}
-                      value={{}}
-                      navigationBar={false}
-                      mainMenuBar={false}
-                      mode={Editor.modes.code}
-                      ace={ace}
-                      theme="ace/theme/monokai"
-                      style={{border: 0}}
-                      htmlElementProps={{"className": "editorWrapper"}}
+              <AceEditor ref={previewEditorRef}
+                         value={""}
+                         readOnly={true}
+                         mode="json"
+                         width={'full'}
+                         height={'100%'}
+                         theme="monokai"
+                //onChange={{}}
+                         name="aceSummaryEditor"
+                         setOptions={{useWorker:false}}
+                         editorProps={{$blockScrolling: true}}
               />
             </Box>
           </Box>
           <Box basis='2/3' overflow={"scroll"} background='#272822'>
             <Text margin={'xsmall'} weight={'bold'}>Reports</Text>
-            <DataTable resizeable={false} size={"full"} alignSelf={"stretch"}
+            <DataTable resizeable={false} size={"full"} alignSelf={"stretch"} primaryKey={false}
                        columns={[
                          {
                            property: 'msg',
-                           header: <Text>Msg</Text>,
+                           header: 'Message',
                            size: 'medium',
                            render: datum => (
                              <Paragraph size={'small'}>
@@ -286,7 +302,6 @@ const JSONEditor = () => {
                          {
                            property: 'level',
                            header: 'Level',
-                           primary: true,
                            render: datum => (
                              <Box>
                                <Text size={'small'}>{datum.level}</Text>
@@ -294,7 +309,8 @@ const JSONEditor = () => {
                            )
                          },
                          {
-                           header: <Text>Vertex</Text>,
+                           property: "vertex",
+                           header: "Vertex",
                            size: 'medium',
                            render: datum => (
                              <Box>
@@ -303,7 +319,8 @@ const JSONEditor = () => {
                            )
                          },
                          {
-                           header: <Text>Shard</Text>,
+                           property: "shard",
+                           header: "Shard",
                            render: datum => (
                              <Box>
                                <Text size={'small'}>{datum.annotations["pregel-id"]?.shard}</Text>
@@ -312,7 +329,7 @@ const JSONEditor = () => {
                          },
                          {
                            property: 'phase-step',
-                           header: <Text>Step</Text>,
+                           header: "Step",
                            render: datum => (
                              <Box>
                                <Text size={'small'}>{datum.annotations["phase-step"]}</Text>
@@ -321,7 +338,7 @@ const JSONEditor = () => {
                          },
                          {
                            property: 'phase',
-                           header: <Text>Phase</Text>,
+                           header: "Phase",
                            render: datum => (
                              <Box>
                                <Text size={'small'}>{datum.annotations["phase"]}</Text>
@@ -330,7 +347,7 @@ const JSONEditor = () => {
                          },
                          {
                            property: 'global-superstep',
-                           header: <Text>Superstep</Text>,
+                           header: "Superstep",
                            render: datum => (
                              <Box>
                                <Text size={'small'}>{datum.annotations["global-superstep"]}</Text>
