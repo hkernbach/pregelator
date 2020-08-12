@@ -339,7 +339,7 @@ const JSONEditor = () => {
                                      {name: 'Shard', content: datum.annotations["pregel-id"]?.shard},
                                      {
                                        name: 'Step / Superstep',
-                                       content: (datum.annotations["phase-step"] || 'nA') + " / " + (datum.annotations["global-superstep"] || 'nA')
+                                       content: (datum.annotations["phase-step"]) + " / " + (datum.annotations["global-superstep"])
                                      },
                                      {name: 'Phase', content: datum.annotations["phase"]}
                                    ]}
