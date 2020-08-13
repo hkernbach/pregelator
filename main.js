@@ -97,7 +97,9 @@ router.get('/userDefinedAlgorithms', function (req, res) {
   });
 
   // also push demo example
-  result["dev_DemoPageRank"] = exampleAlgo;
+  result["dev_DemoPageRank"] = {
+    algorithm: exampleAlgo
+  };
 
   res.send(result);
 })

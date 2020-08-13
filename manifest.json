@@ -1,21 +1,22 @@
 {
-    "name": "Pregelator",
-    "version": "0.0.1",
-    "description": "Application to easily write and execute customized Pregel algorithms",
-    "engines": {
-        "arangodb": "^3.0.0"
-    },
-    "author": "Heiko Kernbach",
-    "license": "Apache 2",
-    "main": "main.js",
-    "defaultDocument": "build/index.html",
-    "scripts": {
-        "setup": "scripts/setup.js",
-        "teardown": "scripts/teardown.js"
-    },
-    "configuration": {},
-    "files": {
-      "/static": "react/build/static",
-    },
-    "tests": "test/**/*.js"
+  "name": "Pregelator",
+  "version": "0.0.3",
+  "description": "Application to easily write and execute customized Pregel algorithms",
+  "engines": {
+    "arangodb": "^3.0.0"
+  },
+  "author": "Heiko Kernbach",
+  "license": "Apache 2",
+  "main": "main.js",
+  "defaultDocument": "index.html",
+  "scripts": {
+    "setup": "scripts/setup.js",
+    "teardown": "scripts/teardown.js"
+  },
+  "configuration": {},
+  "files": {
+    "/index.html": "build/index.html",
+    "/static": "build/static"
+  },
+  "tests": "test/**/*.js"
 }
