@@ -186,7 +186,7 @@ const JSONEditor = () => {
     }
   }
 
-  const getSelectedAlgorithm = () => {
+  /*const getSelectedAlgorithm = () => {
     if (selectedLocalAlgorithm) {
       let algorithm = "";
       try {
@@ -198,7 +198,7 @@ const JSONEditor = () => {
     }
     // default
     return JSON.stringify({}, null, 2)
-  }
+  }*/
 
   // TODO: export function - copy & paste of RunningPregelList
   const fetchExecutionResult = (execution) => {
@@ -213,7 +213,7 @@ const JSONEditor = () => {
         headers:
           {'Content-Type': 'application/json'}
       }).then((responseStatus) => {
-      if (responseStatus.data && responseStatus.data.state === 'done') {
+      if (responseStatus.data && (responseStatus.data.state === 'done' || responseStatus.data.state === 'canceled')) {
         post(
           process.env.REACT_APP_ARANGODB_COORDINATOR_URL + 'resultDetails',
           {
