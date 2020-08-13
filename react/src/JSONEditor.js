@@ -287,7 +287,6 @@ const JSONEditor = () => {
       <Box direction='row' fill="vertical">
         <Box flex>
           <AceEditor ref={editorRef}
-                     value={getSelectedAlgorithm()}
                      mode="json"
                      width={'full'}
                      height={'100%'}
