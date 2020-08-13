@@ -11,6 +11,9 @@ const createRouter = require('@arangodb/foxx/router');
 const router = createRouter();
 module.context.use(router);
 
+// example algo
+const exampleAlgo = require('./algos/exampleAlgorithm').exampleAlgo;
+
 router.post('/start', function (req, res) {
   const name = req.body.name || "name";
   const graphName = req.body.graphName;
@@ -24,13 +27,13 @@ router.post('/start', function (req, res) {
     pid: pid
   });
 })
-.body(
-  joi.object().required(),
-  'This implies JSON.'
-)
-.response(['application/json'], 'A generic greeting.')
-.summary('Generic greeting')
-.description('Prints a generic greeting.');
+  .body(
+    joi.object().required(),
+    'This implies JSON.'
+  )
+  .response(['application/json'], 'A generic greeting.')
+  .summary('Generic greeting')
+  .description('Prints a generic greeting.');
 
 router.post('/resultDetails', function (req, res) {
   const graphName = req.body.graphName || "";
@@ -52,34 +55,52 @@ router.post('/resultDetails', function (req, res) {
       }
     ).toArray();
     finalResult[collectionName].push(res);
-  };
+  }
+  ;
 
   res.send(finalResult);
 })
-.body(
-  joi.object().required(),
-  'This implies JSON.'
-)
-.response(['application/json'], 'A generic greeting.')
-.summary('Generic greeting')
-.description('Prints a generic greeting.');
+  .body(
+    joi.object().required(),
+    'This implies JSON.'
+  )
+  .response(['application/json'], 'A generic greeting.')
+  .summary('Generic greeting')
+  .description('Prints a generic greeting.');
 
 router.post('/status', function (req, res) {
   const pid = req.body.pid || "";
   let result = pregel.status(pid);
   res.send(result);
 })
-.body(
-  joi.object().required(),
-  'This implies JSON.'
-)
-.response(['application/json'], 'A generic greeting.')
-.summary('Generic greeting')
-.description('Prints a generic greeting.');
+  .body(
+    joi.object().required(),
+    'This implies JSON.'
+  )
+  .response(['application/json'], 'A generic greeting.')
+  .summary('Generic greeting')
+  .description('Prints a generic greeting.');
 
 router.get('/graphs', function (req, res) {
   res.send(sgm._list());
 })
-.response(['application/json'], 'A generic greeting.')
-.summary('Generic greeting')
-.description('Prints a generic greeting.');
+  .response(['application/json'], 'A generic greeting.')
+  .summary('Generic greeting')
+  .description('Prints a generic greeting.');
+
+router.get('/userDefinedAlgorithms', function (req, res) {
+  const qualifiedName = module.context.collectionName("userDefinedAlgorithms");
+  let arr = db[qualifiedName].all().toArray();
+  let result = {};
+  arr.forEach(document => {
+    result[document._key] = document;
+  });
+
+  // also push demo example
+  result["dev_DemoPageRank"] = exampleAlgo;
+
+  res.send(result);
+})
+  .response(['application/json'], 'A generic greeting.')
+  .summary('Generic greeting')
+  .description('Prints a generic greeting.');

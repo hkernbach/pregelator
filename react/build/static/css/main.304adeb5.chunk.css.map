@@ -1,0 +1,1 @@
+{"version":3,"sources":["customList.css"],"names":[],"mappings":"AAAA,gBACE,cAAe,CACf,eACF,CAEA,WACE,iBAAkB,CAClB,8BACF,CAEA,cACE,WACF","file":"main.304adeb5.chunk.css","sourcesContent":[".smallList span {\n  font-size: 14px;\n  font-weight: 400;\n}\n\n.smallList {\n  border-radius: 5px;\n  background: rgba(255,255,255, 0.04);\n}\n\n.smallList li {\n  border: none;\n}\n"]}

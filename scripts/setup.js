@@ -1,6 +1,6 @@
 'use strict';
 const db = require('@arangodb').db;
-const documentCollections = [];
+const documentCollections = ['userDefinedAlgorithms'];
 const edgeCollections = [];
 
 for (const localName of documentCollections) {

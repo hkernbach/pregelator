@@ -1,6 +1,6 @@
 'use strict';
 const db = require('@arangodb').db;
-const collections = [];
+const collections = ['userDefinedAlgorithms'];
 
 for (const localName of collections) {
   const qualifiedName = module.context.collectionName(localName);

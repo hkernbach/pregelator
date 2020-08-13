@@ -12,15 +12,14 @@ import {toast} from "react-toastify";
 
 import {usePregel} from "./PregelContext";
 import {SmartGraphListContext} from "./SmartGraphListContext";
+import {UserDefinedAlgorithmsContext} from "./UserDefinedAlgorithmsContext";
 import {useExecution} from "./ExecutionContext";
-
-const exampleAlgorithm = require('./algos/exampleAlgorithm.js').exampleAlgo;
 
 const EditorActionsBar = (props) => (
   <Box
     direction='row'
     align='center'
-    background='#272822'
+    background='dark-1'
     pad={{left: 'small', right: 'small', vertical: 'small'}}
     elevation='medium'
     style={{zIndex: '1'}}
@@ -167,11 +166,39 @@ const JSONEditor = () => {
 
 // global states
   const [graphs] = useContext(SmartGraphListContext);
+  const [userDefinedAlgorithms] = useContext(UserDefinedAlgorithmsContext);
   const [pregels, setPregels] = usePregel();
   const [execution, setExecution] = useExecution();
 
 // local state
   const [selectedGraph, setSelectedGraph] = useState(null);
+  const [selectedLocalAlgorithm, setLocalSelectedAlgorithm] = useState(null);
+
+  const setSelectedAlgorithm = (algo) => {
+    setLocalSelectedAlgorithm(algo);
+
+    let algorithm = "";
+    try {
+      algorithm = userDefinedAlgorithms[algo].algorithm;
+      editorRef.current.editor.setValue(JSON.stringify(algorithm, null, 2), -1);
+    } catch (e) {
+      toast(`Something went wrong: ${e}`);
+    }
+  }
+
+  const getSelectedAlgorithm = () => {
+    if (selectedLocalAlgorithm) {
+      let algorithm = "";
+      try {
+        algorithm = userDefinedAlgorithms[selectedLocalAlgorithm].algorithm;
+      } catch (e) {
+        toast("Error: " + e);
+      }
+      return JSON.stringify(algorithm, null, 2)
+    }
+    // default
+    return JSON.stringify({}, null, 2)
+  }
 
   // TODO: export function - copy & paste of RunningPregelList
   const fetchExecutionResult = (execution) => {
@@ -230,6 +257,16 @@ const JSONEditor = () => {
 
       <EditorActionsBar>
         <Select
+          options={Object.keys(userDefinedAlgorithms)}
+          margin={{right: 'small'}}
+          placeholder={'Select Algorithm'}
+          //value={Object.keys(userDefinedAlgorithms)}
+          onChange={({option}) => {
+            setSelectedAlgorithm(option);
+          }}
+        />
+
+        <Select
           options={graphs}
           placeholder={'Select SmartGraph'}
           value={selectedGraph}
@@ -244,12 +281,13 @@ const JSONEditor = () => {
           margin={{left: 'small'}}
           onClick={executeAlgorithm}
         />
+
       </EditorActionsBar>
 
       <Box direction='row' fill="vertical">
         <Box flex>
           <AceEditor ref={editorRef}
-                     value={JSON.stringify(exampleAlgorithm, null, 2)}
+                     value={getSelectedAlgorithm()}
                      mode="json"
                      width={'full'}
                      height={'100%'}
@@ -270,8 +308,8 @@ const JSONEditor = () => {
 
         <Box flex direction='column'>
           <Box flex direction='row' width={'full'} height="small">
-            <Box basis={'1/2'} background='#272822'>
-              <Box background={'#7D4CDB'}><Text margin={'xsmall'} weight={'bold'}>Summary</Text></Box>
+            <Box basis={'1/2'} background='dark-1'>
+              <Box background={'brand'}><Text margin={'xsmall'} weight={'bold'}>Summary</Text></Box>
               <AceEditor ref={outputEditorRef}
                          readOnly={true}
                          value={""}
@@ -285,8 +323,8 @@ const JSONEditor = () => {
                          editorProps={{$blockScrolling: true}}
               />
             </Box>
-            <Box basis={'1/2'} background='#272822'>
-              <Box background={'#7D4CDB'}><Text margin={'xsmall'} weight={'bold'}>Preview</Text></Box>
+            <Box basis={'1/2'} background='dark-1'>
+              <Box background={'brand'}><Text margin={'xsmall'} weight={'bold'}>Preview</Text></Box>
               <AceEditor ref={previewEditorRef}
                          value={""}
                          readOnly={true}
@@ -301,8 +339,8 @@ const JSONEditor = () => {
               />
             </Box>
           </Box>
-          <Box background={'#7D4CDB'}><Text margin={'xsmall'} weight={'bold'}>Reports</Text></Box>
-          <Box basis='2/3' overflow={"scroll"} background='#272822'>
+          <Box background={'brand'}><Text margin={'xsmall'} weight={'bold'}>Reports</Text></Box>
+          <Box basis='2/3' overflow={"scroll"} background='dark-1'>
             <DataTable resizeable={false} size={"full"} alignSelf={"stretch"} primaryKey={false}
                        columns={[
                          {
